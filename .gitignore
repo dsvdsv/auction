@@ -1,0 +1,5 @@
+.gradle
+.idea
+.bloop
+out
+build
