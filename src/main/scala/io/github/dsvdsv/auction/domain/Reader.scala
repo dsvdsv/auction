@@ -6,7 +6,7 @@ import cats.effect.{Blocker, ContextShift, Sync}
 import fs2.{io, text, Stream}
 
 class Reader[F[_]: Sync] private (stream: Stream[F, Byte]) {
-  def apply(): F[List[String]] =
+  def read: F[List[String]] =
     stream.through(text.utf8Decode)
       .through(text.lines)
       .filter(s => !s.trim.isEmpty)

@@ -21,19 +21,22 @@ class Parser[F[_]](implicit F: MonadError[F, Error]) {
     volumeOrErr.pure[F].rethrow
   }
 
-  private def validateAmount(s: String): F[Amount] = {
+  private def validateAmount(s: String): F[Price] = {
     val amountOrErr = Either
       .catchOnly[NumberFormatException](BigDecimal(s))
       .leftMap(_ => FormatError(s"amount: $s should be bigdecimal"))
       .flatMap { n =>
-        RefType.applyRef[Amount](n).leftMap(FormatError(_))
+        RefType.applyRef[Price](n).leftMap(FormatError(_))
       }
     amountOrErr.pure[F].rethrow
   }
 
   def parse(s: String): F[Order] =
     s.split(" ") match {
-      case Array(d, v, a) => (validateDirection(d), validateVolume(v), validateAmount(a)).mapN(Order)
-      case _              => FormatError(s"Unexpected format of $s").raiseError[F, Order]
+      case Array(d, v, a) =>
+        (validateDirection(d), validateVolume(v), validateAmount(a)).mapN {
+          case (direction, volume, amount) => Order.fromTupleIso.get((direction, volume, amount))
+        }
+      case _ => FormatError(s"Unexpected format of $s").raiseError[F, Order]
     }
 }

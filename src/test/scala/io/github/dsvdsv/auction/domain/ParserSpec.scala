@@ -10,7 +10,9 @@ import org.scalatestplus.scalacheck.Checkers
 @RunWith(classOf[JUnitRunner])
 class ParserSpec extends FunSpec with Matchers with Checkers {
 
-  val parser = new Parser[EitherT[SyncIO, Error, ?]]
+  type Stack[A] = EitherT[SyncIO, Error, A]
+
+  val parser = new Parser[Stack]
 
   it("success parse") {
     val res = parser.parse("B 100 15.40").value.unsafeRunSync()

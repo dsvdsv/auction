@@ -19,6 +19,6 @@ class ReaderSpec extends FunSpec with Matchers with Checkers {
 
     val reader = Reader(stream)
 
-    reader().unsafeRunSync() should contain allOf ("B 100 15.40", "B 100 15.30", "S 150 15.30")
+    reader.read.unsafeRunSync() should contain allOf ("B 100 15.40", "B 100 15.30", "S 150 15.30")
   }
 }
